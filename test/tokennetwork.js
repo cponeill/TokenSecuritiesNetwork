@@ -33,14 +33,18 @@ contract("TokenSecurities", (accounts) => {
 		assert.ok(tokenSecurity)
 	});
 
+	it("shoud return balance of address", async () => {
+		let ownerBalance = await token.balanceOf(firstAccount)
+		assert.equal(ownerBalance.c[0], 2);
+	});
+
 	it("should transfer ownership of contract and allow new owner to mint", async () => {
 		await token.transferOwnership(secondAccount);
 		await assertRevert(token.mint("My new token", "TKN", 10));
 	});
 
-	it("shoud return balance of address", async () => {
-		let ownerBalance = await token.balanceOf(firstAccount)
-		assert.equal(ownerBalance.c[0], 2);
+	it("owner of contract should be address contract transfered to.", async () => {
+		assert.equal(await token.owner(), secondAccount);
 	});
 
 	it("should get security", async () => {
