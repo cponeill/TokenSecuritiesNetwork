@@ -15,12 +15,12 @@ contract("TokenSecurities", (accounts) => {
 	});
 
 	it("should start with no tokens", async () => {
-		assert.equal((await token.totalSupply()).toNumber(), 0)
+		assert.equal((await token.balanceOf(firstAccount)), 0)
 	});
 
 	it("new tokens should be created", async () => {
 		await token.mint("My new token", "TKN", 100000)
-		assert.equal((await token.totalSupply()).toNumber(), 1)
+		assert.equal((await token.balanceOf(firstAccount)).toNumber(), 1)
 	});
 
 	it("should set the owner to the creator contract", async () => {
@@ -52,4 +52,16 @@ contract("TokenSecurities", (accounts) => {
 		await assertRevert(token.mint("My new token", "TKN", 10));
 	});
 
+});
+
+contract("Transfer Ownership of Token", (accounts) => {
+	const [firstAccount, secondAccount, thirdAccount] = accounts;
+
+	it("Should transfer ownership of a token", async () => {
+		let contract = await TokenSecurities.new(name, symbol, totalSupply, {from: firstAccount});
+		let token = await contract.mint("My new token", "TKN", 10);
+		let tokenIndex = token.receipt.transactionIndex;
+		await contract.safeTransferFrom(firstAccount, secondAccount, tokenIndex);
+		assert.equal(await contract.ownerOf(tokenIndex), secondAccount);
+	});
 });
